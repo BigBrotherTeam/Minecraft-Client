@@ -1,0 +1,76 @@
+Spawn Object
+Spawn Experience Orb
+Spawn Global Entity
+Spawn Mob
+Spawn Painting
+Spawn Player
+Animation (clientbound)
+Statistics
+Block Break Animation
+Update Block Entity
+Block Action
+Block Change
+Boss Bar
+Server Difficulty
+Tab-Complete
+Chat Message
+Multi Block Change
+Confirm Transaction
+Close Window
+Open Window
+Window Items
+Window Property
+Set Slot
+Set Cooldown
+Plugin Message
+Named Sound Effect
+Disconnect (play)
+Entity Status
+Explosion
+Unload Chunk
+Change Game State
+Keep Alive
+Chunk Data
+Effect
+Particle
+Join Game
+Map
+Entity Relative Move
+Entity Look And Relative Move
+Entity Look
+Entity
+Vehicle Move (clientbound)
+Open Sign Editor
+Player Abilities (clientbound)
+Combat Event
+Player List Item
+Player Position And Look (clientbound)
+Use Bed
+Destroy Entities
+Remove Entity Effect
+Resource Pack Send
+Respawn
+Entity Head Look
+World Border
+Camera
+Held Item Change (clientbound)
+Display Scoreboard
+Entity Metadata
+Attach Entity
+Entity Velocity
+Entity Equipment
+Set Experience
+Update Health
+Scoreboard Objective
+Set Passengers
+Teams
+Update Score
+Spawn Position
+Time Update
+Title
+Sound Effect
+Player List Header And Footer
+Collect Item
+Entity Teleport
+Entity Properties
+Entity Effect

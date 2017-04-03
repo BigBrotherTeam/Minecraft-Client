@@ -90,9 +90,14 @@ class MinecraftClient{
 
 	public function tick(){
 		while($this->working){
-			$this->getCommandLine();
+			//$this->getCommandLine();
 			for($i = 0; $i <= 100000; $i++){
-				$this->socketreader->tick();
+				if(!$this->working){
+					return;
+				}
+				if($this->socketreader->tick()){
+					$this->getCommandLine();
+				}
 			}
 		}
 	}
@@ -127,6 +132,7 @@ class MinecraftClient{
 	public function shutdown(){
 		$this->working = false;
 		$this->config->save();
+		$this->socketreader->shutdown();
 		$this->logger->info("Shutdown a system now...");
 	}
 

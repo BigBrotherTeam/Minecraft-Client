@@ -75,9 +75,9 @@ class SocketReader{
 
 	public function tick(){
 		if(!$this->working){
-			return;
+			return false;
 		}
-		$this->client->tick();
+		return $this->client->tick();
 	}
 
 	public function write($data){

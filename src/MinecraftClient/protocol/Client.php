@@ -18,9 +18,11 @@ use MinecraftClient\utils\Binary;
 
 class Client{
 	public $status = "";
+	public $wait = false;
 	public $endstatus = [];
 	public $args = [];
 	public $waitstatus = [];
+	public $packetname;
 
 	public function __construct($logger, $username, $serverip, $serverport, $socketreader){
 		$this->logger = $logger;
@@ -29,10 +31,12 @@ class Client{
 		$this->serverport = $serverport;
 		$this->socketreader = $socketreader;
 		$this->threshold = null;
+
+		$this->packetname = file(__DIR__."/packetname.txt");
 	}
 
 	public function receive(){
-		echo "receive\n";
+		//echo "receive\n";
 		$len = Binary::readVarIntSession($this->socketreader, $offset);
 		$buffer = $this->socketreader->read($len);
 		if($this->threshold !== null){
@@ -98,74 +102,23 @@ class Client{
 		$data = $this->receive();
 		$offset = 0;
 		$pid = Binary::readVarInt($data, $offset);
-		echo $pid."\n";
-		echo bin2hex(chr($pid))."\n";
+
+		if($pid === 0x27 or $pid === 0x26 or $pid === 0x25 or $pid === 0x34){
+			return ;
+		}
+
+		echo $this->packetname[$pid]."\n";
+
+
+		/*echo $pid."\n";
+		echo bin2hex(chr($pid))."\n";*/
 		switch($pid){
-			case 0x03:
-
-			break;
-			case 0x07:
-
-			break;
-			case 0x0d://Server Difficulty
-
-			break;
-			case 0x18:
-
-			break;
-			case 0x1b:
-
-			break;
-			case 0x1f:
-
-			break;
-			case 0x20:
-				$x = Binary::readInt(substr($data, $offset, 4));
-
-				$offset += 4;
-
-				$z = Binary::readInt(substr($data, $offset, 4));
-
-				$offset += 4;
-
-				$GroundUp = Binary::readByte(substr($data, $offset, 1));
-
-				echo "GroundUp: ".$GroundUp."\n";
-
-				$offset += 1;
-
-				$bak = $offset;
-
-				$bitmask = Binary::readVarInt($data, $offset);
-
-				echo "bitmask: ".$bitmask."\n";
-
-				$size = Binary::readVarInt($data, $offset);
-
-				echo "size: ".$size."\n";
-
-				$reason = "Chunk Loaded! (".$x.":".$z.")";
-				$payload = Binary::writeVarInt(0x02).Binary::writeVarInt(strlen($reason)).$reason;
+			case 0x1f://keep alive
+				$payload = Binary::writeVarInt(0x0b).Binary::writeVarInt(mt_rand());
 				$this->send($payload);
-
-				file_put_contents($x.":".$z.".dat", substr($data, $bak));
-			break;
-			case 0x23://JoinGame
-
-				
-			break;
-			case 0x2b://Player Ab
-				/*$payload = Binary::writeVarInt(0x04).Binary::writeVarInt(strlen($reason)).$reason;
-				$this->send($payload);*/
-			break;
-			case 0x2d:
-
-			break;
-			case 0x43:
-
 			break;
 			default:
-				echo "Unknown: ".$pid."\n";
+				//echo "Unknown: ".$pid."\n";
 
 
 				/*$reason = json_encode(["text" => "Log out"]);
@@ -173,11 +126,13 @@ class Client{
 				$this->send($payload);*/
 				
 
-				$this->finish(__FUNCTION__);
+				//$this->finish(__FUNCTION__);
 			break;
-			case 55:
-
-			break;
+		}
+		if($this->wait){
+			$this->wait = false;
+		}else{
+			$this->wait = true;
 		}
 	}
 
@@ -244,7 +199,7 @@ class Client{
 						default:
 							echo "Unknown: ".$pid."\n";
 							$this->finish(__FUNCTION__);
-							//var_dump($data);
+							var_dump($data);
 						break;
 					}
 				break;
@@ -330,6 +285,7 @@ class Client{
 		if($this->status !== ""){
 			call_user_func([$this, $this->status]);
 		}
+		return $this->wait;
 	}
 
 	public function shutdown(){
