@@ -200,6 +200,25 @@ class Binary{
 		}
 	}
 
+	public static function writeLong($value){
+		if(PHP_INT_SIZE === 8){
+			return pack("NN", $value >> 32, $value & 0xFFFFFFFF);
+		}else{
+			$x = "";
+
+			if(bccomp($value, "0") == -1){
+				$value = bcadd($value, "18446744073709551616");
+			}
+
+			$x .= self::writeShort(bcmod(bcdiv($value, "281474976710656"), "65536"));
+			$x .= self::writeShort(bcmod(bcdiv($value, "4294967296"), "65536"));
+			$x .= self::writeShort(bcmod(bcdiv($value, "65536"), "65536"));
+			$x .= self::writeShort(bcmod($value, "65536"));
+
+			return $x;
+		}
+	}
+
 	public static function readLLong($str){
 		return self::readLong(strrev($str));
 	}

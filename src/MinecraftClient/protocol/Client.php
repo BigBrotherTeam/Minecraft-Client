@@ -103,19 +103,44 @@ class Client{
 		$offset = 0;
 		$pid = Binary::readVarInt($data, $offset);
 
-		if($pid === 0x27 or $pid === 0x26 or $pid === 0x25 or $pid === 0x34){
+		/*if($pid === 0x27 or $pid === 0x26 or $pid === 0x25 or $pid === 0x34){
 			return ;
-		}
+		}*/
 
-		echo $this->packetname[$pid]."\n";
+
+		if($pid !== 54 and $pid !== 40 and $pid !== 39 and $pid !== 38){
+			echo $this->packetname[$pid]."\n";
+		}
 
 
 		/*echo $pid."\n";
 		echo bin2hex(chr($pid))."\n";*/
 		switch($pid){
+			/*case 0x00://disconnect (play)
+				var_dump(strlen($data));
+				$length = Binary::readVarInt($data, $offset);
+				$data = substr($data, $offset, $length);
+
+				$reasontext = json_decode($data, true);
+				var_dump($reasontext);
+
+				$this->finish(__FUNCTION__);
+			break;*/
 			case 0x1f://keep alive
-				$payload = Binary::writeVarInt(0x0b).Binary::writeVarInt(mt_rand());
+				$keepaliveid = Binary::readLong(substr($data, $offset, 8));
+				$offset += 8;
+
+				$payload = Binary::writeVarInt(0x0b).Binary::writeLong($keepaliveid);
 				$this->send($payload);
+			break;
+			case 0x1a://disconnect (play)
+				$length = Binary::readVarInt($data, $offset);
+				$data = substr($data, $offset, $length);
+
+				$reasontext = json_decode($data, true);
+				var_dump($reasontext);
+
+				$this->finish(__FUNCTION__);
 			break;
 			default:
 				//echo "Unknown: ".$pid."\n";
@@ -157,16 +182,23 @@ class Client{
 							$data = substr($data, $offset, $length);
 
 							$reasontext = json_decode($data, true);
-							echo $reasontext."\n";
 
-							$reason = $reasontext["text"];
-							if(isset($serverstatus["text"]["extra"])){
+							$reason = $reasontext["translate"];
+							switch($reason){
+								case "multiplayer.disconnect.outdated_client":
+									$reason = "This is oldClient....";
+								break;
+							}
+
+							if(isset($serverstatus["translate"]["extra"])){
 								foreach($reasontext["extra"] as $text){
 									$reason .= $text["text"];
 								}
 							}
 
 							echo "Reason: ".$reason."\n\n";
+
+							$this->finish(__FUNCTION__);
 						break;
 						case 0x01://Encryption Request
 							echo "This software can offline server!\n";
@@ -199,7 +231,6 @@ class Client{
 						default:
 							echo "Unknown: ".$pid."\n";
 							$this->finish(__FUNCTION__);
-							var_dump($data);
 						break;
 					}
 				break;
@@ -211,7 +242,7 @@ class Client{
 			$this->args["Status"] = "Send";
 			echo "Send\n";
 
-			$payload = Binary::writeVarInt(0x00).Binary::writeVarInt(316).Binary::writeVarInt(strlen($this->serverip)).$this->serverip.
+			$payload = Binary::writeVarInt(0x00).Binary::writeVarInt(340).Binary::writeVarInt(strlen($this->serverip)).$this->serverip.
 						Binary::writeShort(25565).Binary::writeVarInt(2);
 
 			$this->send($payload);
@@ -281,6 +312,7 @@ class Client{
 			if($this->status === null){
 				$this->status = "";
 			}
+			$this->wait = true;
 		}
 		if($this->status !== ""){
 			call_user_func([$this, $this->status]);
@@ -289,9 +321,9 @@ class Client{
 	}
 
 	public function shutdown(){
-		$reason = json_encode(["text" => "Log out"]);
+		/*$reason = json_encode(["text" => "Log out"]);
 		$payload = Binary::writeVarInt(0x1a).Binary::writeVarInt(strlen($reason)).$reason;
-		$this->send($payload);
+		$this->send($payload);*/
 
 		$this->finish(__FUNCTION__);
 	}

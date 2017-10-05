@@ -12,45 +12,48 @@ Block Action
 Block Change
 Boss Bar
 Server Difficulty
-Tab-Complete
-Chat Message
+Tab-Complete (clientbound)
+Chat Message (clientbound)
 Multi Block Change
-Confirm Transaction
-Close Window
+Confirm Transaction (clientbound)
+Close Window (clientbound)
 Open Window
 Window Items
 Window Property
 Set Slot
 Set Cooldown
-Plugin Message
+Plugin Message (clientbound)
 Named Sound Effect
 Disconnect (play)
 Entity Status
 Explosion
 Unload Chunk
 Change Game State
-Keep Alive
+Keep Alive (clientbound)
 Chunk Data
 Effect
 Particle
 Join Game
 Map
+Entity
 Entity Relative Move
 Entity Look And Relative Move
 Entity Look
-Entity
 Vehicle Move (clientbound)
 Open Sign Editor
+Craft Recipe Response
 Player Abilities (clientbound)
 Combat Event
 Player List Item
 Player Position And Look (clientbound)
 Use Bed
+Unlock Recipes
 Destroy Entities
 Remove Entity Effect
 Resource Pack Send
 Respawn
 Entity Head Look
+Select Advancement Tab
 World Border
 Camera
 Held Item Change (clientbound)
@@ -72,5 +75,6 @@ Sound Effect
 Player List Header And Footer
 Collect Item
 Entity Teleport
+Advancements
 Entity Properties
 Entity Effect

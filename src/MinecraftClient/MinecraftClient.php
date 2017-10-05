@@ -111,7 +111,7 @@ class MinecraftClient{
 				case "shutdown":
 					$this->shutdown();
 				break;
-				case"help":
+				case "help":
 					if(isset($line[1])){
 						switch($line[1]){
 							case "stop":
@@ -122,6 +122,7 @@ class MinecraftClient{
 					}else{
 						$this->logger->info("使用できるコマンド\n-stop\n-shutdown : 解析を終了します");
 					}
+				break;
 				default:
 					$this->logger->info("UnknownCommand: ".$line[0]."");
 				break;
