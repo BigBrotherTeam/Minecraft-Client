@@ -1,16 +1,30 @@
 <?php
 
-/*
- *▪   ▄▄▄·       ▄▄· ▄ •▄ ▄▄▄ .▄▄▄▄▄
- *██ ▐█ ▄█▪     ▐█ ▌▪█▌▄▌▪▀▄.▀·•██
- *▐█· ██▀· ▄█▀▄ ██ ▄▄▐▀▀▄·▐▀▀▪▄ ▐█.▪
- *▐█▌▐█▪·•▐█▌.▐▌▐███▌▐█.█▌▐█▄▄▌ ▐█▌·
- *▀▀▀.▀    ▀█▄▀▪·▀▀▀ ·▀  ▀ ▀▀▀  ▀▀▀
+/**
+ *  ______  __         ______               __    __
+ * |   __ \|__|.-----.|   __ \.----..-----.|  |_ |  |--..-----..----.
+ * |   __ <|  ||  _  ||   __ <|   _||  _  ||   _||     ||  -__||   _|
+ * |______/|__||___  ||______/|__|  |_____||____||__|__||_____||__|
+ *             |_____|
  *
- *This program is free software:
- *ComputerEdition Packet Analyze.
+ * BigBrother plugin for PocketMine-MP
+ * Copyright (C) 2014-2015 shoghicp <https://github.com/shoghicp/BigBrother>
+ * Copyright (C) 2016- BigBrotherTeam
  *
-*/
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * @author BigBrotherTeam
+ * @link   https://github.com/BigBrotherTeam/BigBrother
+ *
+ */
 
 namespace MinecraftClient\protocol;
 
@@ -94,6 +108,18 @@ class Client{
 		//}
 	}
 
+	public function say(string $text){
+		$payload = Binary::writeVarInt(0x02).Binary::writeVarInt(strlen($text)).$text;
+
+		$this->send($payload);
+	}
+
+	public function say(string $text){
+		$payload = Binary::writeVarInt(0x02).Binary::writeVarInt(strlen($text)).$text;
+
+		$this->send($payload);
+	}
+
 	public function loginsuccess(){
 		if(!$this->start(__FUNCTION__)){
 			return;
@@ -103,29 +129,18 @@ class Client{
 		$offset = 0;
 		$pid = Binary::readVarInt($data, $offset);
 
-		/*if($pid === 0x27 or $pid === 0x26 or $pid === 0x25 or $pid === 0x34){
-			return ;
+		/*if($pid !== 54 and $pid !== 40 and $pid !== 39 and $pid !== 38){
+			echo $this->packetname[$pid]."\n";
 		}*/
 
-
-		if($pid !== 54 and $pid !== 40 and $pid !== 39 and $pid !== 38){
-			echo $this->packetname[$pid]."\n";
-		}
-
-
-		/*echo $pid."\n";
-		echo bin2hex(chr($pid))."\n";*/
 		switch($pid){
-			/*case 0x00://disconnect (play)
-				var_dump(strlen($data));
+			case 0x0f:
 				$length = Binary::readVarInt($data, $offset);
 				$data = substr($data, $offset, $length);
 
-				$reasontext = json_decode($data, true);
-				var_dump($reasontext);
-
-				$this->finish(__FUNCTION__);
-			break;*/
+				$text = json_decode($data, true);
+				var_dump($text);
+			break;
 			case 0x1f://keep alive
 				$keepaliveid = Binary::readLong(substr($data, $offset, 8));
 				$offset += 8;
@@ -142,16 +157,16 @@ class Client{
 
 				$this->finish(__FUNCTION__);
 			break;
+			case 0x4d:
+				//file_put_contents("Advancements.dat", substr($data, $offset));
+			break;
+			case 0x17:
+				//file_put_contents("CraftingBookData.dat", substr($data, $offset));
+			break;
+			case 0x31:
+				file_put_contents("UnlockRecipes.dat", substr($data, $offset));
+			break;
 			default:
-				//echo "Unknown: ".$pid."\n";
-
-
-				/*$reason = json_encode(["text" => "Log out"]);
-				$payload = Binary::writeVarInt(0x1a).Binary::writeVarInt(strlen($reason)).$reason;
-				$this->send($payload);*/
-				
-
-				//$this->finish(__FUNCTION__);
 			break;
 		}
 		if($this->wait){
@@ -165,8 +180,6 @@ class Client{
 		if(!$this->start(__FUNCTION__)){
 			return;
 		}
-		
-		echo "joinServer\n";
 
 		if(isset($this->args["Status"])){
 			switch($this->args["Status"]){
@@ -175,7 +188,6 @@ class Client{
 
 					$offset = 0;
 					$pid = Binary::readVarInt($data, $offset);
-					echo $pid."\n";
 					switch($pid){
 						case 0x00://Disconnect (login)
 							$length = Binary::readVarInt($data, $offset);
@@ -205,7 +217,6 @@ class Client{
 							$this->finish(__FUNCTION__);
 						break;
 						case 0x02://Login Success
-							echo "Login\n";
 							$length = Binary::readVarInt($data, $offset);
 							$uuid = substr($data, $offset, $length);
 
@@ -240,7 +251,6 @@ class Client{
 			}
 		}else{
 			$this->args["Status"] = "Send";
-			echo "Send\n";
 
 			$payload = Binary::writeVarInt(0x00).Binary::writeVarInt(340).Binary::writeVarInt(strlen($this->serverip)).$this->serverip.
 						Binary::writeShort(25565).Binary::writeVarInt(2);
@@ -257,8 +267,6 @@ class Client{
 		if(!$this->start(__FUNCTION__)){
 			return;
 		}
-
-		echo "checkServer\n";
 
 		if(isset($this->args["Status"])){
 			switch($this->args["Status"]){
@@ -293,7 +301,6 @@ class Client{
 			}
 		}else{
 			$this->args["Status"] = "Send";
-			echo "Send\n";
 
 			$payload = Binary::writeVarInt(0x00).Binary::writeVarInt(316).Binary::writeVarInt(strlen($this->serverip)).$this->serverip.
 						Binary::writeShort(25565).Binary::writeVarInt(1);
