@@ -114,12 +114,6 @@ class Client{
 		$this->send($payload);
 	}
 
-	public function say(string $text){
-		$payload = Binary::writeVarInt(0x02).Binary::writeVarInt(strlen($text)).$text;
-
-		$this->send($payload);
-	}
-
 	public function loginsuccess(){
 		if(!$this->start(__FUNCTION__)){
 			return;
